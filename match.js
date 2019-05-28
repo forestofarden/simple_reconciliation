@@ -1,25 +1,33 @@
 // reconcile two lists, emitting matches and unmatched values
 
-function match(a, b) {
+function match(a, b, canonical) {
   const def = (v) => v || 0
   const times = (i,f) => { while(i--) { f() } }
 
-  let as = {}, bs = {}
+  let as = {}, bs = {}, vals = {}
 
-  // generate a hash of counts for each value
-  //    across both datasets
-  a.forEach( (v) => { as[v] = def(as[v]) + 1, bs[v] = def(bs[v]) })
-  b.forEach( (v) => { as[v] = def(as[v]),     bs[v] = def(bs[v]) + 1 })
+  if(!canonical) { canonical = (x) => x }
 
-  // some javascript book-keeping: hash keys are strings, not values (sadly)
-  let vals = Object.keys(as).map( (v) => parseFloat(v) )
+  // generate a hash of counts for each value across both datasets
+  a.forEach( (v) => {
+    let k = canonical(v)
+    vals[k] = v
+    as[k] = def(as[k]) + 1
+    bs[k] = def(bs[k])
+  })
+  b.forEach( (v) => {
+    let k = canonical(v)
+    vals[k] = v
+    as[k] = def(as[k])
+    bs[k] = def(bs[k]) + 1
+  })
 
   // for each discrete value, allot matches
   let matches = [], unmatched_a = [], unmatched_b = []
-  vals.forEach( (v) => {
-    times(Math.min(as[v], bs[v]),   () => matches.push(v))
-    times(Math.max(0, as[v]-bs[v]), () => unmatched_a.push(v))
-    times(Math.max(0, bs[v]-as[v]), () => unmatched_b.push(v))
+  Object.keys(vals).forEach( (v) => {
+    times(Math.min(as[v], bs[v]),   () => matches.push(vals[v]))
+    times(Math.max(0, as[v]-bs[v]), () => unmatched_a.push(vals[v]))
+    times(Math.max(0, bs[v]-as[v]), () => unmatched_b.push(vals[v]))
   })
 
   return [ matches, unmatched_a, unmatched_b ]
