@@ -1,0 +1,16 @@
+{
+  "name": "duco",
+  "version": "1.0.0",
+  "description": "May 16, 2019",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "tape": "^4.10.2"
+  },
+  "dependencies": {},
+  "type": "module"
+}

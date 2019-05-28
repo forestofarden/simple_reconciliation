@@ -9,9 +9,15 @@ The main function is in 'match.js'
 
 https://github.com/christopheryork/simple_reconciliation/blob/master/match.js
 
-No installation required.  To run the code, open 'index.html', or browse to:
-
-http://christopheryork.github.io/simple_reconciliation/
-
+To install (OS X with Homebrew):
+```
+cd duco
+brew install node
+npm install
+```
+To run the test suite:
+```
+node --experimental-modules ./index.js
+```
 N.B. Solution is written for code clarity & similarity to ruby.
      Some javascript shortcuts taken.
