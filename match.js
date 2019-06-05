@@ -1,26 +1,29 @@
 // reconcile two lists, emitting matches and unmatched values
 
-function match(a, b, canonical) {
+// this solution retains O(n) performance by exploiting equality characteristics
+//   of the proposed tolerance functions (absolute value and case-insensitivity).
+//
+// instead of taking a boolean-valued function that indicates if two values match
+//   (subject to known tolerances), it takes a canonicalization function.
+//
+// the canonicalization function must guarantee that all values within a given
+//   tolerance map to the same output.  to reconcile, matches are counted in a
+//   single pass over the inputs, using a hash of counts keyed to the canonical
+//   values
+//
+// [ N.B. no promises are made about which value is emitted for a given tolerance
+//   match ]
+
+function match(a, b, canonical = (x) => x) {
   const def = (v) => v || 0
   const times = (i,f) => { while(i--) { f() } }
 
   let as = {}, bs = {}, vals = {}
+  const canon = (v, vals) => { let k = canonical(v); vals[k] = v; return k }
 
-  if(!canonical) { canonical = (x) => x }
-
-  // generate a hash of counts for each value across both datasets
-  a.forEach( (v) => {
-    let k = canonical(v)
-    vals[k] = v
-    as[k] = def(as[k]) + 1
-    bs[k] = def(bs[k])
-  })
-  b.forEach( (v) => {
-    let k = canonical(v)
-    vals[k] = v
-    as[k] = def(as[k])
-    bs[k] = def(bs[k]) + 1
-  })
+  // generate a hash of counts for each canonical value across both datasets
+  a.forEach( (v) => { v = canon(v, vals);  as[v] = def(as[v]) + 1;  bs[v] = def(bs[v]) } )
+  b.forEach( (v) => { v = canon(v, vals);  as[v] = def(as[v]);      bs[v] = def(bs[v]) + 1 } )
 
   // for each discrete value, allot matches
   let matches = [], unmatched_a = [], unmatched_b = []
